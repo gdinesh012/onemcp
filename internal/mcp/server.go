@@ -310,7 +310,7 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 		"has_more":       end < totalCount,
 		"tools":          toolMetadata,
 		"schema_file":    s.schemaFilePath,
-		"message":        fmt.Sprintf("Showing %d of %d tools. For complete tool list with full schemas, read: %s", len(toolMetadata), totalCount, s.schemaFilePath),
+		"message":        fmt.Sprintf("Showing %d of %d tools. For complete tool list with full schemas, search with filesystem tools in: %s", len(toolMetadata), totalCount, s.schemaFilePath),
 	}
 
 	// Convert result to JSON for the text content

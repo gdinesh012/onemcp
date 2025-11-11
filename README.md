@@ -155,7 +155,7 @@ Discover available tools with optional filtering. Uses **fuzzy matching** to han
 
 **Schema Caching:** External tool schemas are cached at startup for fast repeated searches.
 
-**Hybrid Approach:** Search returns exactly **5 tools inline** plus a `schema_file` path (`/tmp/onemcp-tools-schema.json`) containing **ALL executable tools with full schemas** (external and internal tools only, excluding meta-tools which are already exposed via MCP's `tools/list`). For comprehensive tool exploration, read the schema file using filesystem tools instead of paginating through search results. This reduces token usage while maintaining access to complete tool information.
+**Hybrid Approach:** Search returns exactly **5 tools inline** plus a `schema_file` path (`/tmp/onemcp-tools-schema.json`) containing **ALL executable tools with full schemas** (external and internal tools only, excluding meta-tools which are already exposed via MCP's `tools/list`). For comprehensive tool exploration, search the schema file using filesystem tools instead of paginating through search results. This reduces token usage while maintaining access to complete tool information.
 
 **Example - Basic search:**
 ```json
@@ -190,7 +190,7 @@ Discover available tools with optional filtering. Uses **fuzzy matching** to han
   "limit": 5,
   "has_more": true,
   "schema_file": "/tmp/onemcp-tools-schema.json",
-  "message": "Showing 5 of 21 tools. For complete tool list with full schemas, read: /tmp/onemcp-tools-schema.json",
+  "message": "Showing 5 of 21 tools. For complete tool list with full schemas, search with filesystem tools in: /tmp/onemcp-tools-schema.json",
   "tools": [
     {
       "name": "playwright_browser_navigate",
