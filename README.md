@@ -408,6 +408,11 @@ OneMCP will automatically:
 
 ### Adding Internal Tools
 
+**Note**: Adding internal tools requires modifying the OneMCP source code. You'll need to:
+1. Clone this repository: `git clone https://github.com/radutopala/onemcp.git`
+2. Make your changes (see steps below)
+3. Rebuild the binary: `go build -o one-mcp ./cmd/one-mcp`
+
 To add custom internal tools directly to the OneMCP aggregator:
 
 #### 1. Define your tool struct with input/output types
@@ -498,7 +503,11 @@ mcp.AddTool(server, &mcp.Tool{
 }, s.handleEcho)
 ```
 
-Internal tools are directly exposed via `tools/list` alongside the 3 meta-tools, making them immediately available without needing `tool_search`.
+Internal tools are directly exposed via `tools/list` alongside the 2 meta-tools, making them immediately available without needing `tool_search`.
+
+**When to use internal tools vs external servers:**
+- **Use external servers** (recommended): For most use cases - no code changes needed, just configuration
+- **Use internal tools**: Only when you need tight integration with OneMCP's core logic or want Go's type safety for custom business logic
 
 ## License
 
