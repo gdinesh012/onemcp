@@ -1,6 +1,12 @@
-.PHONY: all build build-darwin build-linux build-all clean test test-coverage test-integration help
+.PHONY: help all build build-darwin build-linux build-all clean test test-coverage test-integration
 
-all: build ## Build for current platform (default target)
+help: ## Show this help message
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Available targets:'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+all: build ## Build for current platform
 
 build: ## Build for current platform
 	@echo "Building for current platform..."
@@ -40,9 +46,3 @@ test-integration: ## Run integration tests (builds binary first)
 	@echo "Note: Binary will be built automatically by the test suite"
 	go test -v -tags=integration ./integration/...
 	@echo "Integration tests completed"
-
-help: ## Show this help message
-	@echo 'Usage: make [target]'
-	@echo ''
-	@echo 'Available targets:'
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
