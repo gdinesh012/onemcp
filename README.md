@@ -40,7 +40,7 @@ OneMCP Aggregator
     ├── Internal Tools (optional)
     │   └── Custom Go-based tools with type-safe handlers
     │
-    └── External MCP Servers (configured via .mcp-servers.json)
+    └── External MCP Servers (configured via .onemcp.json)
         ├── Playwright (21 tools) - Browser automation
         ├── Filesystem (N tools) - File operations
         └── Your Server (N tools) - Any MCP-compliant server
@@ -337,7 +337,7 @@ time=2025-11-11T10:00:04.000+00:00 level=INFO msg="Tool execution successful" na
 
 ### External server fails to start
 
-- Check that the command path is correct in `.mcp-servers.json`
+- Check that the command path is correct in `.onemcp.json`
 - Verify required environment variables are set
 - Check logs in `MCP_LOG_FILE` for startup errors
 - Test the server command manually: `command args...`
@@ -346,7 +346,7 @@ time=2025-11-11T10:00:04.000+00:00 level=INFO msg="Tool execution successful" na
 
 - Use `tool_search` to verify the tool exists
 - Check that tool names include the server prefix (e.g., `playwright_browser_navigate`)
-- Verify the external server is enabled in `.mcp-servers.json`
+- Verify the external server is enabled in `.onemcp.json`
 
 ### Tool execution fails
 
@@ -371,14 +371,14 @@ time=2025-11-11T10:00:04.000+00:00 level=INFO msg="Tool execution successful" na
 │   │   └── registry.go          # Tool registry and dispatcher
 │   └── mcpclient/
 │       └── client.go            # External MCP server client
-├── .mcp-servers.json            # External server configuration
+├── .onemcp.json                 # Configuration (settings + external servers)
 ├── go.mod
 └── README.md
 ```
 
 ### Adding External Servers
 
-Simply add to `.mcp-servers.json` - no code changes required:
+Simply add to `.onemcp.json` - no code changes required:
 
 ```json
 {
