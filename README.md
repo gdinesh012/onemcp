@@ -15,6 +15,17 @@ OneMCP is a **generic MCP aggregator** that:
 - Supports progressive tool discovery (search before loading schemas)
 - Works with any MCP-compliant server
 
+## Why OneMCP?
+
+When working with many MCP servers, exposing hundreds of tools directly to Claude consumes massive amounts of tokens and context window. As explained in Anthropic's [Code Execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp) article, the meta-tool pattern solves this by:
+
+1. **Reducing token overhead**: Instead of loading 50+ tool schemas (tens of thousands of tokens), expose just 2 meta-tools
+2. **Progressive discovery**: Claude searches for relevant tools only when needed
+3. **Preserving context**: More room for actual conversation and code, less for tool definitions
+4. **Scaling gracefully**: Add new servers without increasing baseline token usage
+
+OneMCP implements this pattern as a **universal aggregator** - it works with any MCP server, not just specific integrations.
+
 ## Architecture
 
 ```
