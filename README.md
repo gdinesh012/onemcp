@@ -139,7 +139,7 @@ Add to Claude Desktop config (`~/Library/Application Support/Claude/claude_deskt
 Discover available tools with optional filtering and pagination. Uses **fuzzy matching** to handle typos and small variations.
 
 **Arguments:**
-- `query` (optional) - Search term to filter by name or description (supports fuzzy matching for typos)
+- `query` (optional) - Search term to filter by name or description. Must be a single word for fuzzy matching (e.g., "browser", "navigate", "screenshot")
 - `category` (optional) - Filter by category (e.g., "browser", "filesystem")
 - `detail_level` (optional) - Level of detail to return:
   - `"names_only"` - Just tool names and categories (minimal tokens)
@@ -147,7 +147,7 @@ Discover available tools with optional filtering and pagination. Uses **fuzzy ma
   - `"detailed"` - Includes argument schema
   - `"full_schema"` - Complete schema with all details
 - `offset` (optional) - Number of results to skip (default: 0)
-- `limit` (optional) - Maximum results to return (default: 50, max: 200)
+- `limit` (optional) - Maximum results to return (default: 5, max: 200)
 
 **Fuzzy Matching:** Query terms support fuzzy matching using Levenshtein distance, allowing small typos (e.g., "navgate" matches "navigate", "clik" matches "click"). The matching threshold adapts based on query length.
 

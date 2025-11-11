@@ -221,7 +221,7 @@ func (s *AggregatorServerTestSuite) TestToolSearch_DefaultLimit() {
 	require.NoError(s.T(), err)
 
 	response := s.parseToolSearchResponse(result)
-	require.Equal(s.T(), float64(50), response["limit"], "Should use default limit of 50")
+	require.Equal(s.T(), float64(5), response["limit"], "Should use default limit of 5")
 }
 
 // TestToolSearch_MaxLimit tests the maximum limit cap

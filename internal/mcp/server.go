@@ -189,11 +189,11 @@ func (s *AggregatorServer) registerMetaTools(server *mcp.Server) error {
 
 // ToolSearchInput defines the input for tool_search
 type ToolSearchInput struct {
-	Query       string `json:"query,omitempty" jsonschema:"Optional search term to filter tools by name or description"`
+	Query       string `json:"query,omitempty" jsonschema:"Search term to filter tools by name or description. Must be a single word for fuzzy matching to work (e.g., 'browser', 'navigate', 'screenshot')."`
 	Category    string `json:"category,omitempty" jsonschema:"Optional category filter"`
 	DetailLevel string `json:"detail_level,omitempty" jsonschema:"Detail level: 'names_only' (just names, for broad exploration), 'summary' (name + description, recommended for targeted search), 'detailed' (includes parameter schema), 'full_schema' (complete schema). Default: 'summary'. Use 'summary' or 'detailed' when searching for specific functionality."`
 	Offset      int    `json:"offset,omitempty" jsonschema:"Number of results to skip for pagination. Default: 0"`
-	Limit       int    `json:"limit,omitempty" jsonschema:"Maximum number of results to return. Default: 50, max: 200"`
+	Limit       int    `json:"limit,omitempty" jsonschema:"Maximum number of results to return. Default: 5, max: 200"`
 }
 
 func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallToolRequest, input ToolSearchInput) (*mcp.CallToolResult, any, error) {
@@ -205,7 +205,7 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 	// Set default limit and validate
 	limit := input.Limit
 	if limit == 0 {
-		limit = 50
+		limit = 5
 	}
 	if limit > 200 {
 		limit = 200
