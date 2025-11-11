@@ -19,10 +19,14 @@ type MCPClient struct {
 }
 
 // MCPServerConfig represents configuration for an external MCP server.
+// Supports multiple transport types:
+// - Command transport (stdio): Provide "command" field
+// - HTTP transports (SSE, Streamable): Provide "url" field
 type MCPServerConfig struct {
-	Command  string            `json:"command"`
-	Args     []string          `json:"args,omitempty"`
-	Env      map[string]string `json:"env,omitempty"`
+	Command  string            `json:"command,omitempty"`  // Command to execute (for stdio transport)
+	Args     []string          `json:"args,omitempty"`     // Command arguments
+	URL      string            `json:"url,omitempty"`      // HTTP URL (for SSE/HTTP transport)
+	Env      map[string]string `json:"env,omitempty"`      // Environment variables (stdio only)
 	Category string            `json:"category,omitempty"` // Category for grouping tools
 	Enabled  bool              `json:"enabled"`            // Whether to load this server
 }
@@ -35,6 +39,9 @@ type Tool struct {
 }
 
 // NewMCPClient creates a new MCP client connected to an external server.
+// Supports multiple transport types based on configuration:
+// - Command transport (stdio): When config.Command is provided
+// - SSE transport (HTTP): When config.URL is provided
 func NewMCPClient(ctx context.Context, name string, config MCPServerConfig, logger *slog.Logger) (*MCPClient, error) {
 	// Create MCP client
 	client := mcp.NewClient(
@@ -45,30 +52,46 @@ func NewMCPClient(ctx context.Context, name string, config MCPServerConfig, logg
 		nil,
 	)
 
-	// Create exec.Cmd for the transport
-	cmd := exec.Command(config.Command, config.Args...)
+	var transport mcp.Transport
+	var transportType string
 
-	// Set environment variables
-	if len(config.Env) > 0 {
-		env := os.Environ() // Start with current environment
-		for k, v := range config.Env {
-			env = append(env, fmt.Sprintf("%s=%s", k, v))
+	// Determine transport type based on configuration
+	if config.URL != "" {
+		// HTTP-based transport (SSE)
+		transport = &mcp.SSEClientTransport{
+			Endpoint: config.URL,
 		}
-		cmd.Env = env
-	}
+		transportType = "sse"
+		logger.Info("Using SSE transport", "name", name, "endpoint", config.URL)
+	} else if config.Command != "" {
+		// Command transport (stdio)
+		cmd := exec.Command(config.Command, config.Args...)
 
-	// Create command transport
-	transport := &mcp.CommandTransport{
-		Command: cmd,
+		// Set environment variables
+		if len(config.Env) > 0 {
+			env := os.Environ() // Start with current environment
+			for k, v := range config.Env {
+				env = append(env, fmt.Sprintf("%s=%s", k, v))
+			}
+			cmd.Env = env
+		}
+
+		transport = &mcp.CommandTransport{
+			Command: cmd,
+		}
+		transportType = "stdio"
+		logger.Info("Using stdio transport", "name", name, "command", config.Command)
+	} else {
+		return nil, fmt.Errorf("no transport configured: must provide either 'command' or 'url'")
 	}
 
 	// Connect to the server (this also initializes the connection)
 	session, err := client.Connect(ctx, transport, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to MCP server: %w", err)
+		return nil, fmt.Errorf("failed to connect to MCP server (%s): %w", transportType, err)
 	}
 
-	logger.Info("Connected to external MCP server", "name", name, "command", config.Command)
+	logger.Info("Connected to external MCP server", "name", name, "transport", transportType)
 
 	return &MCPClient{
 		name:        name,

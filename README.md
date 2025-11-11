@@ -77,13 +77,18 @@ OneMCP is built with:
 - **[Official MCP Go SDK](https://github.com/modelcontextprotocol/go-sdk)** v1.1.0 - Anthropic/Google collaboration
 - **Go 1.25** - Modern, efficient, and type-safe
 - **JSON-RPC 2.0** - Standard protocol for MCP communication
-- **Stdio Transport** - Simple and reliable process communication
+- **Multiple Transports** - Stdio (command), HTTP (SSE), and more
 
 The official SDK provides:
 - Type-safe tool registration with automatic schema inference
-- Multiple transport options (stdio, HTTP, SSE, in-memory)
+- Multiple transport options (stdio via CommandTransport, HTTP via SSE, StreamableHTTP, in-memory for testing)
 - Built-in client for connecting to external servers
 - Full support for MCP protocol features
+
+**Supported Transports:**
+- **Command (stdio)**: Execute local commands and communicate via stdin/stdout - most common for local tools
+- **SSE (Server-Sent Events)**: Connect to remote HTTP-based MCP servers - ideal for cloud services
+- **In-Memory**: Direct in-process communication - useful for testing
 
 ## Quick Start
 
@@ -264,17 +269,17 @@ Configure OneMCP behavior:
 
 ### External Server Configuration
 
-Define external MCP servers in the `mcpServers` section:
+Define external MCP servers in the `mcpServers` section. OneMCP supports multiple transport types:
 
+**1. Command Transport (stdio)** - Most common, runs a local command:
 ```json
 {
   "mcpServers": {
-    "server-name": {
-      "command": "path/to/server",     // Required: Command to run
-      "args": ["--arg1", "value1"],    // Optional: Command arguments
+    "playwright": {
+      "command": "npx",                // Command to execute
+      "args": ["-y", "@playwright/mcp"], // Command arguments
       "env": {                          // Optional: Environment variables
-        "API_KEY": "secret",
-        "LOG_LEVEL": "info"
+        "DEBUG": "1"
       },
       "category": "browser",           // Optional: Category for grouping tools
       "enabled": true                  // Required: Whether to load this server
@@ -282,6 +287,29 @@ Define external MCP servers in the `mcpServers` section:
   }
 }
 ```
+
+**2. HTTP Transport (SSE)** - Connect to remote MCP server via HTTP:
+```json
+{
+  "mcpServers": {
+    "remote-server": {
+      "url": "https://api.example.com/mcp", // HTTP URL for SSE transport
+      "category": "api",
+      "enabled": true
+    }
+  }
+}
+```
+
+**Configuration Fields:**
+- `command` (string) - Command to execute (for stdio transport)
+- `args` (array) - Command arguments (stdio only)
+- `url` (string) - HTTP URL (for SSE transport)
+- `env` (object) - Environment variables (stdio only)
+- `category` (string) - Category for grouping tools
+- `enabled` (boolean) - Whether to load this server
+
+**Note:** Provide either `command` or `url`, not both.
 
 ### Environment Variables
 

@@ -3,6 +3,8 @@
     "searchResultLimit": 5
   },
   "mcpServers": {
+    "_comment_transports": "OneMCP supports multiple transports: 'command' for local stdio, 'url' for remote HTTP/SSE",
+
     "playwright": {
       "command": "npx",
       "args": ["-y", "@playwright/mcp"],
@@ -14,6 +16,12 @@
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"],
       "category": "filesystem",
       "enabled": true
+    },
+    "remote-mcp-server": {
+      "url": "https://api.example.com/mcp",
+      "category": "api",
+      "enabled": false,
+      "_comment": "Example HTTP/SSE transport - connect to remote MCP server"
     },
     "memory": {
       "command": "npx",
