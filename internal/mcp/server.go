@@ -268,6 +268,8 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 
 	var foundTools []*tools.Tool
 
+	s.logger.Info("Tool search request", "query", input.Query, "category", input.Category, "detail_level", input.DetailLevel, "offset", offset, "limit", limit)
+
 	// Use semantic search with vector store
 	if s.vectorStore != nil {
 		var err error
@@ -275,6 +277,8 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 		if err != nil {
 			s.logger.Error("Semantic search failed", "error", err)
 			foundTools = []*tools.Tool{} // Return empty results on error
+		} else {
+			s.logger.Info("Semantic search completed", "query", input.Query, "results_found", len(foundTools))
 		}
 
 		// Apply category filter if specified
@@ -285,6 +289,7 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 					filtered = append(filtered, tool)
 				}
 			}
+			s.logger.Info("Applied category filter", "category", input.Category, "before", len(foundTools), "after", len(filtered))
 			foundTools = filtered
 		}
 	} else {
@@ -305,6 +310,8 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 		end = totalCount
 	}
 	paginatedTools := foundTools[start:end]
+
+	s.logger.Info("Tool search response", "total_found", totalCount, "returned", len(paginatedTools), "offset", offset, "limit", limit)
 
 	toolMetadata := make([]tools.ToolMetadata, len(paginatedTools))
 	for i, tool := range paginatedTools {
