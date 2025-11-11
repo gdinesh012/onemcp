@@ -59,17 +59,36 @@ OneMCP Aggregator
 OneMCP includes several optimizations for token efficiency and speed:
 
 1. **Configurable Result Limit**: Returns 5 tools per search by default (configurable via `.onemcp.json`)
-2. **Hybrid Schema Approach**: Limited tools inline + complete schema file for comprehensive exploration
+2. **Semantic Search**: Word2Vec embeddings understand tool relationships for smarter discovery
 3. **Progressive Discovery**: Four detail levels (names_only → summary → detailed → full_schema)
 4. **Schema Caching**: External tool schemas cached at startup, no repeated fetching
-5. **Fuzzy Search**: Levenshtein distance algorithm handles typos without multiple queries
+5. **In-Memory Vector Store**: Pre-computed embeddings for instant semantic search
 6. **Lazy Loading**: Schemas only sent when explicitly requested via detail_level
 
 **Token Usage Examples (default 5 tools):**
 - `names_only` search: ~50 tokens total
 - `summary` search: ~200-400 tokens total
 - `full_schema` search: ~2000-5000 tokens total
-- Schema file path: ~50 tokens (read file separately for complete tool list)
+
+### Semantic Search
+
+OneMCP uses **Word2Vec embeddings** by default for intelligent tool discovery:
+
+- **Learns word relationships**: Understands that "screenshot" and "capture" are similar
+- **Context-aware**: Considers how words appear together in tool descriptions
+- **Pure Go**: No external ML dependencies, trains automatically at startup
+- **Configurable**: Switch to TF-IDF for faster keyword-based search
+
+**Example:** Query "capture page image" finds `browser_screenshot` tool even though the exact words don't match, because Word2Vec learned the semantic relationship between "capture/screenshot" and "page/browser" from tool descriptions.
+
+**Configuration:**
+```json
+{
+  "settings": {
+    "embedderType": "word2vec"  // or "tfidf" for keyword-based
+  }
+}
+```
 
 ## Technology
 
@@ -118,7 +137,8 @@ Create `.onemcp.json`:
 ```json
 {
   "settings": {
-    "searchResultLimit": 5
+    "searchResultLimit": 5,
+    "embedderType": "word2vec"
   },
   "mcpServers": {
     "playwright": {
@@ -268,13 +288,15 @@ Configure OneMCP behavior:
 ```json
 {
   "settings": {
-    "searchResultLimit": 5
+    "searchResultLimit": 5,
+    "embedderType": "word2vec"
   }
 }
 ```
 
 **Available Settings:**
 - `searchResultLimit` (number) - Number of tools to return per search query. Default: 5. Lower values reduce token usage but require more searches for discovery.
+- `embedderType` (string) - Type of semantic search embedder. Options: `"word2vec"` (default, better semantic understanding), `"tfidf"` (faster, keyword-based). Word2Vec learns word relationships from tool descriptions for improved search relevance.
 
 ### External Server Configuration
 
@@ -422,7 +444,8 @@ Simply add to the `mcpServers` section in `.onemcp.json` - no code changes requi
 ```json
 {
   "settings": {
-    "searchResultLimit": 5
+    "searchResultLimit": 5,
+    "embedderType": "word2vec"
   },
   "mcpServers": {
     "your-server": {
