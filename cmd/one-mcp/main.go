@@ -39,7 +39,7 @@ func main() {
 
 	serverVersion := os.Getenv("MCP_SERVER_VERSION")
 	if serverVersion == "" {
-		serverVersion = "0.1.0"
+		serverVersion = "1.0.0"
 	}
 
 	// Initialize MCP Aggregator Server

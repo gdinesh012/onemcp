@@ -2,7 +2,7 @@
 
 A universal Model Context Protocol (MCP) aggregator that combines multiple external MCP servers into a unified interface with progressive discovery.
 
-**Version 0.2.0** - Generic aggregator with meta-tool architecture for improved efficiency and extensibility.
+**Version 1.0.0** - Production-ready generic aggregator with meta-tool architecture for improved efficiency and extensibility.
 
 **Built with the official [MCP Go SDK](https://github.com/modelcontextprotocol/go-sdk)** from Anthropic/Google collaboration.
 
@@ -286,7 +286,7 @@ Define external MCP servers in the `mcpServers` section:
 ### Environment Variables
 
 - `MCP_SERVER_NAME` - Server name (default: "one-mcp-aggregator")
-- `MCP_SERVER_VERSION` - Server version (default: "0.1.0")
+- `MCP_SERVER_VERSION` - Server version (default: "1.0.0")
 - `MCP_LOG_FILE` - Log file path (default: "/tmp/one-mcp.log")
 
 ## Tool Naming Convention
@@ -326,7 +326,7 @@ LLM: Now taking screenshot...
 Logs are written to the file specified by `MCP_LOG_FILE` (default: `/tmp/one-mcp.log`):
 
 ```
-time=2025-11-11T10:00:00.000+00:00 level=INFO msg="Starting OneMCP aggregator server over stdio..." name=one-mcp-aggregator version=0.2.0
+time=2025-11-11T10:00:00.000+00:00 level=INFO msg="Starting OneMCP aggregator server over stdio..." name=one-mcp-aggregator version=1.0.0
 time=2025-11-11T10:00:01.000+00:00 level=INFO msg="Loaded external MCP server" name=playwright tools=21 category=browser
 time=2025-11-11T10:00:02.000+00:00 level=INFO msg="Registered tool" name=playwright_browser_navigate category=browser
 time=2025-11-11T10:00:03.000+00:00 level=INFO msg="Executing tool" name=playwright_browser_navigate
