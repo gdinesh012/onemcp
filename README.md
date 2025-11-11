@@ -86,9 +86,18 @@ The official SDK provides:
 - Full support for MCP protocol features
 
 **Supported Transports:**
-- **Command (stdio)**: Execute local commands and communicate via stdin/stdout - most common for local tools
-- **Streamable HTTP**: Connect to remote HTTP-based MCP servers using the modern standard (MCP spec 2025-03-26+) - ideal for cloud services
+- **Command (stdio)**: Execute local commands and communicate via stdin/stdout using JSON-RPC - most common for local tools
+- **Streamable HTTP**: Connect to remote HTTP-based MCP servers using JSON-RPC over HTTP with optional SSE streaming (MCP spec 2025-03-26+) - ideal for cloud services
 - **In-Memory**: Direct in-process communication - useful for testing
+
+**Protocol Details:**
+- All MCP communication uses **JSON-RPC 2.0** for message encoding
+- **Stdio transport**: JSON-RPC messages over stdin/stdout
+- **Streamable HTTP transport**: JSON-RPC via HTTP POST/GET with optional Server-Sent Events (SSE) for streaming responses
+  - Single endpoint (no dual endpoint complexity)
+  - Supports both request/response and streaming
+  - Session management via `Mcp-Session-Id` header
+  - Automatic reconnection with `Last-Event-ID` for resilience
 
 ## Quick Start
 
