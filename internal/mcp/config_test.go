@@ -36,11 +36,6 @@ func TestLoadConfigWithComments(t *testing.T) {
 	err := os.WriteFile(configPath, []byte(configContent), 0644)
 	require.NoError(t, err)
 
-	// Set environment variable to use our test config
-	oldEnv := os.Getenv("ONEMCP_CONFIG")
-	defer os.Setenv("ONEMCP_CONFIG", oldEnv)
-	os.Setenv("ONEMCP_CONFIG", configPath)
-
 	// Create aggregator server
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
 	server := &AggregatorServer{
@@ -48,7 +43,7 @@ func TestLoadConfigWithComments(t *testing.T) {
 	}
 
 	// Load config
-	config, err := server.loadConfig()
+	config, err := server.loadConfig(configPath)
 	require.NoError(t, err)
 	require.NotNil(t, config)
 
@@ -84,11 +79,6 @@ func TestLoadConfigWithoutComments(t *testing.T) {
 	err := os.WriteFile(configPath, []byte(configContent), 0644)
 	require.NoError(t, err)
 
-	// Set environment variable to use our test config
-	oldEnv := os.Getenv("ONEMCP_CONFIG")
-	defer os.Setenv("ONEMCP_CONFIG", oldEnv)
-	os.Setenv("ONEMCP_CONFIG", configPath)
-
 	// Create aggregator server
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
 	server := &AggregatorServer{
@@ -96,7 +86,7 @@ func TestLoadConfigWithoutComments(t *testing.T) {
 	}
 
 	// Load config
-	config, err := server.loadConfig()
+	config, err := server.loadConfig(configPath)
 	require.NoError(t, err)
 	require.NotNil(t, config)
 
@@ -110,10 +100,8 @@ func TestLoadConfigWithoutComments(t *testing.T) {
 }
 
 func TestLoadConfigMissingFile(t *testing.T) {
-	// Set environment variable to non-existent file
-	oldEnv := os.Getenv("ONEMCP_CONFIG")
-	defer os.Setenv("ONEMCP_CONFIG", oldEnv)
-	os.Setenv("ONEMCP_CONFIG", "/tmp/non-existent-config.json")
+	// Use non-existent file path
+	configPath := "/tmp/non-existent-config.json"
 
 	// Create aggregator server
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
@@ -122,7 +110,7 @@ func TestLoadConfigMissingFile(t *testing.T) {
 	}
 
 	// Load config - should return empty config without error
-	config, err := server.loadConfig()
+	config, err := server.loadConfig(configPath)
 	require.NoError(t, err)
 	require.NotNil(t, config)
 	require.Equal(t, 0, config.Settings.SearchResultLimit)

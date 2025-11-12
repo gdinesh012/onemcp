@@ -48,8 +48,14 @@ func main() {
 		serverVersion = "0.2.0"
 	}
 
+	// Get config path from environment or use default
+	configPath := os.Getenv("ONEMCP_CONFIG")
+	if configPath == "" {
+		configPath = ".onemcp.json"
+	}
+
 	// Initialize MCP Aggregator Server
-	mcpServer, err := mcp.NewAggregatorServer(serverName, serverVersion, logger)
+	mcpServer, err := mcp.NewAggregatorServer(serverName, serverVersion, configPath, logger)
 	if err != nil {
 		logger.Error("Failed to create OneMCP aggregator server", "error", err)
 		os.Exit(1)

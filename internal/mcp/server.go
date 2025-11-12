@@ -45,7 +45,7 @@ type AggregatorServer struct {
 }
 
 // NewAggregatorServer creates a new generic aggregator server
-func NewAggregatorServer(name, version string, logger *slog.Logger) (*AggregatorServer, error) {
+func NewAggregatorServer(name, version, configPath string, logger *slog.Logger) (*AggregatorServer, error) {
 	ctx := context.Background()
 
 	aggregator := &AggregatorServer{
@@ -56,7 +56,7 @@ func NewAggregatorServer(name, version string, logger *slog.Logger) (*Aggregator
 	}
 
 	// Load configuration and initialize external MCP servers
-	config, err := aggregator.loadConfig()
+	config, err := aggregator.loadConfig(configPath)
 	if err != nil {
 		logger.Warn("Failed to load config, using defaults", "error", err)
 		// Set default search provider
@@ -124,12 +124,7 @@ func NewAggregatorServer(name, version string, logger *slog.Logger) (*Aggregator
 }
 
 // loadConfig loads the .onemcp.json configuration file
-func (s *AggregatorServer) loadConfig() (*Config, error) {
-	configPath := os.Getenv("ONEMCP_CONFIG")
-	if configPath == "" {
-		configPath = ".onemcp.json"
-	}
-
+func (s *AggregatorServer) loadConfig(configPath string) (*Config, error) {
 	s.logger.Info("Looking for config", "path", configPath)
 
 	data, err := os.ReadFile(configPath)

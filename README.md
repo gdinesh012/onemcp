@@ -211,11 +211,17 @@ Create `.onemcp.json`:
 ### 3. Run the aggregator
 
 ```bash
-# Start OneMCP aggregator
+# Start OneMCP aggregator (uses .onemcp.json by default)
 ./one-mcp
+
+# Use custom config file
+ONEMCP_CONFIG=/path/to/config.json ./one-mcp
 
 # Or with custom server name/version
 MCP_SERVER_NAME=my-aggregator MCP_SERVER_VERSION=0.2.0 ./one-mcp
+
+# Enable debug logging
+MCP_LOG_LEVEL=debug ./one-mcp
 ```
 
 ### 4. Use with MCP Clients
@@ -403,9 +409,11 @@ Define external MCP servers in the `mcpServers` section. OneMCP supports multipl
 
 ### Environment Variables
 
+- `ONEMCP_CONFIG` - Configuration file path (default: ".onemcp.json")
 - `MCP_SERVER_NAME` - Server name (default: "one-mcp-aggregator")
 - `MCP_SERVER_VERSION` - Server version (default: "0.2.0")
 - `MCP_LOG_FILE` - Log file path (default: "/tmp/one-mcp.log")
+- `MCP_LOG_LEVEL` - Log level: "debug" or "info" (default: "info")
 
 ## Tool Naming Convention
 

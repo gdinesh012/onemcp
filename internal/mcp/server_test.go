@@ -27,7 +27,7 @@ func (s *AggregatorServerTestSuite) SetupTest() {
 		Level: slog.LevelError, // Quiet during tests
 	}))
 
-	server, err := NewAggregatorServer("test-server", "1.0.0", logger)
+	server, err := NewAggregatorServer("test-server", "1.0.0", ".onemcp.json", logger)
 	require.NoError(s.T(), err, "Failed to create test server")
 
 	// Register test tools
