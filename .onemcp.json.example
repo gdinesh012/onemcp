@@ -1,6 +1,9 @@
 {
   "settings": {
-    "searchResultLimit": 5
+    "searchResultLimit": 5,
+    "embedderType": "glove",
+    "gloveModel": "6B.100d",
+    "gloveCacheDir": "/tmp/onemcp-glove"
   },
   "mcpServers": {
     "_comment_transports": "OneMCP supports multiple transports: 'command' for local stdio, 'url' for remote Streamable HTTP",

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -274,4 +275,23 @@ func (e *GloVeEmbedder) Dimension() int {
 // GetVocabularySize returns the number of words in the vocabulary
 func (e *GloVeEmbedder) GetVocabularySize() int {
 	return len(e.vectors)
+}
+
+// normalize normalizes a vector to unit length
+func normalize(vec []float32) []float32 {
+	var sum float32
+	for _, v := range vec {
+		sum += v * v
+	}
+
+	if sum == 0 {
+		return vec
+	}
+
+	norm := float32(math.Sqrt(float64(sum)))
+	result := make([]float32, len(vec))
+	for i, v := range vec {
+		result[i] = v / norm
+	}
+	return result
 }

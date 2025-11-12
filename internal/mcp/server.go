@@ -23,7 +23,7 @@ type Config struct {
 // Settings represents OneMCP settings
 type Settings struct {
 	SearchResultLimit int    `json:"searchResultLimit"` // Number of tools to return per search (default: 5)
-	EmbedderType      string `json:"embedderType"`      // Type of embedder: "tfidf", "word2vec", or "glove" (default: "tfidf")
+	EmbedderType      string `json:"embedderType"`      // Type of embedder: "tfidf" or "glove" (default: "tfidf")
 	GloVeModel        string `json:"gloveModel"`        // GloVe model: "6B.50d", "6B.100d", "6B.200d", "6B.300d" (default: "6B.100d")
 	GloveCacheDir     string `json:"gloveCacheDir"`     // Directory to cache GloVe models (default: "/tmp/onemcp-glove")
 }
@@ -36,7 +36,7 @@ type AggregatorServer struct {
 	vectorStore       vectorstore.VectorStore // Semantic search engine
 	externalClients   map[string]*mcpclient.MCPClient
 	searchResultLimit int    // Number of tools to return per search
-	embedderType      string // Type of embedder to use (tfidf, word2vec, or glove)
+	embedderType      string // Type of embedder to use (tfidf or glove)
 	gloveModel        string // GloVe model to use
 	gloveCacheDir     string // GloVe cache directory
 }
@@ -234,9 +234,6 @@ func (s *AggregatorServer) initializeVectorStore() error {
 		} else {
 			embedder = gloveEmb
 		}
-	case "word2vec":
-		s.logger.Info("Creating Word2Vec embedder", "window_size", 5, "dimension", 100)
-		embedder = vectorstore.NewWord2VecEmbedder(5, 100) // window=5, dim=100
 	case "tfidf":
 		s.logger.Info("Creating TF-IDF embedder")
 		embedder = vectorstore.NewTFIDFEmbedder(s.logger)
