@@ -8,18 +8,18 @@ import (
 	"github.com/radutopala/onemcp/internal/tools"
 )
 
-// CodexSearchStore uses Codex CLI for semantic search without embeddings
+// CodexSearchStore uses Codex CLI for semantic search
 type CodexSearchStore struct {
-	embedder *CodexSearcher
+	searcher *CodexSearcher
 	tools    []*tools.Tool
 	schemas  []byte // Cached JSON schemas
 	logger   *slog.Logger
 }
 
-// NewCodexSearchStore creates a vector store that uses Codex CLI
-func NewCodexSearchStore(embedder *CodexSearcher, logger *slog.Logger) *CodexSearchStore {
+// NewCodexSearchStore creates a search store that uses Codex CLI
+func NewCodexSearchStore(searcher *CodexSearcher, logger *slog.Logger) *CodexSearchStore {
 	return &CodexSearchStore{
-		embedder: embedder,
+		searcher: searcher,
 		tools:    make([]*tools.Tool, 0),
 		logger:   logger,
 	}
@@ -27,7 +27,7 @@ func NewCodexSearchStore(embedder *CodexSearcher, logger *slog.Logger) *CodexSea
 
 // BuildFromTools caches tool schemas for Codex queries
 func (s *CodexSearchStore) BuildFromTools(allTools []*tools.Tool) error {
-	s.logger.Info("Building Codex vector store", "tool_count", len(allTools))
+	s.logger.Info("Building Codex search index", "tool_count", len(allTools))
 
 	s.tools = allTools
 
@@ -58,7 +58,7 @@ func (s *CodexSearchStore) BuildFromTools(allTools []*tools.Tool) error {
 
 	s.schemas = schemas
 
-	s.logger.Info("Codex vector store built", "tool_count", len(s.tools), "schema_size_kb", len(schemas)/1024)
+	s.logger.Info("Codex search index built", "tool_count", len(s.tools), "schema_size_kb", len(schemas)/1024)
 
 	return nil
 }
@@ -70,7 +70,7 @@ func (s *CodexSearchStore) Search(query string, topK int) ([]*tools.Tool, error)
 	}
 
 	// Ask Codex to rank tools
-	toolNames, err := s.embedder.SearchTools(query, s.schemas, topK)
+	toolNames, err := s.searcher.SearchTools(query, s.schemas, topK)
 	if err != nil {
 		return nil, fmt.Errorf("codex search failed: %w", err)
 	}

@@ -8,18 +8,18 @@ import (
 	"github.com/radutopala/onemcp/internal/tools"
 )
 
-// ClaudeSearchStore uses Claude CLI for semantic search without embeddings
+// ClaudeSearchStore uses Claude CLI for semantic search
 type ClaudeSearchStore struct {
-	embedder *ClaudeSearcher
+	searcher *ClaudeSearcher
 	tools    []*tools.Tool
 	schemas  []byte // Cached JSON schemas
 	logger   *slog.Logger
 }
 
-// NewClaudeSearchStore creates a vector store that uses Claude CLI
-func NewClaudeSearchStore(embedder *ClaudeSearcher, logger *slog.Logger) *ClaudeSearchStore {
+// NewClaudeSearchStore creates a search store that uses Claude CLI
+func NewClaudeSearchStore(searcher *ClaudeSearcher, logger *slog.Logger) *ClaudeSearchStore {
 	return &ClaudeSearchStore{
-		embedder: embedder,
+		searcher: searcher,
 		tools:    make([]*tools.Tool, 0),
 		logger:   logger,
 	}
@@ -27,7 +27,7 @@ func NewClaudeSearchStore(embedder *ClaudeSearcher, logger *slog.Logger) *Claude
 
 // BuildFromTools caches tool schemas for Claude queries
 func (s *ClaudeSearchStore) BuildFromTools(allTools []*tools.Tool) error {
-	s.logger.Info("Building Claude vector store", "tool_count", len(allTools))
+	s.logger.Info("Building Claude search index", "tool_count", len(allTools))
 
 	s.tools = allTools
 
@@ -58,7 +58,7 @@ func (s *ClaudeSearchStore) BuildFromTools(allTools []*tools.Tool) error {
 
 	s.schemas = schemas
 
-	s.logger.Info("Claude vector store built", "tool_count", len(s.tools), "schema_size_kb", len(schemas)/1024)
+	s.logger.Info("Claude search index built", "tool_count", len(s.tools), "schema_size_kb", len(schemas)/1024)
 
 	return nil
 }
@@ -70,7 +70,7 @@ func (s *ClaudeSearchStore) Search(query string, topK int) ([]*tools.Tool, error
 	}
 
 	// Ask Claude to rank tools
-	toolNames, err := s.embedder.SearchTools(query, s.schemas, topK)
+	toolNames, err := s.searcher.SearchTools(query, s.schemas, topK)
 	if err != nil {
 		return nil, fmt.Errorf("claude search failed: %w", err)
 	}

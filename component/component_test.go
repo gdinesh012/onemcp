@@ -530,7 +530,7 @@ func (s *ComponentTestSuite) TestToolSearchDetailLevels() {
 	}
 }
 
-// TestVectorStoreInitialization tests that vector store is properly initialized
+// TestSearchStoreInitialization tests that search store is properly initialized
 func (s *ComponentTestSuite) TestVectorStoreInitialization() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
@@ -544,7 +544,7 @@ func (s *ComponentTestSuite) TestVectorStoreInitialization() {
 	initResp := s.readResponse()
 	require.Nil(s.T(), initResp.Error)
 
-	// Make a search query to verify vector store is working
+	// Make a search query to verify search store is working
 	s.sendRequest("tools/call", map[string]any{
 		"name": "tool_search",
 		"arguments": map[string]any{
@@ -568,7 +568,7 @@ func (s *ComponentTestSuite) TestVectorStoreInitialization() {
 	err := json.Unmarshal([]byte(firstContent["text"].(string)), &result)
 	require.NoError(s.T(), err)
 
-	// Verify we got results structure (vector store is working)
+	// Verify we got results structure (search store is working)
 	require.Contains(s.T(), result, "total_count")
 	totalCount := int(result["total_count"].(float64))
 	require.GreaterOrEqual(s.T(), totalCount, 0, "Should have valid total_count (may be 0 if no external tools configured)")

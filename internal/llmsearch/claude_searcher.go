@@ -16,7 +16,7 @@ type ClaudeSearcher struct {
 	logger       *slog.Logger
 }
 
-// NewClaudeSearcher creates a new Claude-based embedder
+// NewClaudeSearcher creates a new Claude-based searcher
 func NewClaudeSearcher(model string, logger *slog.Logger) (*ClaudeSearcher, error) {
 	// Default to haiku if not specified
 	if model == "" {
@@ -29,7 +29,7 @@ func NewClaudeSearcher(model string, logger *slog.Logger) (*ClaudeSearcher, erro
 		return nil, fmt.Errorf("claude CLI not found in PATH: %w", err)
 	}
 
-	logger.Info("Created Claude embedder", "model", model, "binary", claudePath)
+	logger.Info("Created Claude searcher", "model", model, "binary", claudePath)
 
 	return &ClaudeSearcher{
 		model:        model,
@@ -38,13 +38,13 @@ func NewClaudeSearcher(model string, logger *slog.Logger) (*ClaudeSearcher, erro
 	}, nil
 }
 
-// Generate is not used for Claude embedder (we use direct search instead)
-// This satisfies the EmbeddingGenerator interface but shouldn't be called
+// Generate is not used for Claude searcher (we use direct LLM search instead)
+// This exists for interface compatibility but shouldn't be called
 func (e *ClaudeSearcher) Generate(text string) ([]float32, error) {
-	return nil, fmt.Errorf("Claude embedder doesn't support Generate() - use Search() directly")
+	return nil, fmt.Errorf("Claude searcher doesn't support Generate() - use SearchTools() directly")
 }
 
-// Dimension returns a dummy dimension (Claude doesn't use vector embeddings)
+// Dimension returns 0 (Claude uses LLM-based search, not vector embeddings)
 func (e *ClaudeSearcher) Dimension() int {
 	return 0 // No vector embeddings
 }

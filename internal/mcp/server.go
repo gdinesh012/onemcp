@@ -115,9 +115,9 @@ func NewAggregatorServer(name, version, configPath string, logger *slog.Logger) 
 
 	aggregator.server = server
 
-	// Initialize vector store for semantic search
+	// Initialize search store for LLM-powered semantic search
 	if err := aggregator.initializeSearchStore(); err != nil {
-		logger.Warn("Failed to initialize vector store, semantic search disabled", "error", err)
+		logger.Warn("Failed to initialize search store, semantic search disabled", "error", err)
 	}
 
 	return aggregator, nil
@@ -329,7 +329,7 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 
 	s.logger.Info("Tool search request", "query", input.Query, "category", input.Category, "detail_level", input.DetailLevel, "offset", offset, "limit", limit)
 
-	// Use semantic search with vector store
+	// Use LLM-powered semantic search
 	if s.searchStore != nil {
 		var err error
 		foundTools, err = s.searchStore.Search(input.Query, limit*3) // Get more results for filtering
@@ -352,8 +352,8 @@ func (s *AggregatorServer) handleToolSearch(ctx context.Context, req *mcp.CallTo
 			foundTools = filtered
 		}
 	} else {
-		// No vector store available
-		s.logger.Warn("Vector store not initialized")
+		// No search store available
+		s.logger.Warn("Search store not initialized")
 		foundTools = []*tools.Tool{}
 	}
 

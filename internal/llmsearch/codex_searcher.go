@@ -16,7 +16,7 @@ type CodexSearcher struct {
 	logger      *slog.Logger
 }
 
-// NewCodexSearcher creates a new Codex-based embedder
+// NewCodexSearcher creates a new Codex-based searcher
 func NewCodexSearcher(model string, logger *slog.Logger) (*CodexSearcher, error) {
 	// Default to gpt-5-codex-mini if not specified
 	if model == "" {
@@ -29,7 +29,7 @@ func NewCodexSearcher(model string, logger *slog.Logger) (*CodexSearcher, error)
 		return nil, fmt.Errorf("codex CLI not found in PATH: %w", err)
 	}
 
-	logger.Info("Created Codex embedder", "model", model, "binary", codexPath)
+	logger.Info("Created Codex searcher", "model", model, "binary", codexPath)
 
 	return &CodexSearcher{
 		model:       model,
@@ -38,13 +38,13 @@ func NewCodexSearcher(model string, logger *slog.Logger) (*CodexSearcher, error)
 	}, nil
 }
 
-// Generate is not used for Codex embedder (we use direct search instead)
-// This satisfies the EmbeddingGenerator interface but shouldn't be called
+// Generate is not used for Codex searcher (we use direct LLM search instead)
+// This exists for interface compatibility but shouldn't be called
 func (e *CodexSearcher) Generate(text string) ([]float32, error) {
-	return nil, fmt.Errorf("Codex embedder doesn't support Generate() - use Search() directly")
+	return nil, fmt.Errorf("Codex searcher doesn't support Generate() - use SearchTools() directly")
 }
 
-// Dimension returns a dummy dimension (Codex doesn't use vector embeddings)
+// Dimension returns 0 (Codex uses LLM-based search, not vector embeddings)
 func (e *CodexSearcher) Dimension() int {
 	return 0 // No vector embeddings
 }
