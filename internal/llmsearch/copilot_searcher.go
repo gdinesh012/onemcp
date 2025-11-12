@@ -23,10 +23,10 @@ func NewCopilotSearcher(model string, logger *slog.Logger) (*CopilotSearcher, er
 		model = "claude-haiku-4.5"
 	}
 
-	// Find copilot binary (could be 'gh copilot' or standalone)
-	copilotPath, err := exec.LookPath("gh")
+	// Find copilot binary
+	copilotPath, err := exec.LookPath("copilot")
 	if err != nil {
-		return nil, fmt.Errorf("GitHub CLI (gh) not found in PATH: %w", err)
+		return nil, fmt.Errorf("copilot CLI not found in PATH: %w", err)
 	}
 
 	logger.Info("Created Copilot searcher", "model", model, "binary", copilotPath)
@@ -60,12 +60,11 @@ Consider:
 
 Return ONLY the JSON array, no explanation.`, query, string(toolSchemas), topK, topK)
 
-	// Call gh copilot CLI
+	// Call copilot CLI
 	cmd := exec.Command(
 		s.copilotBinary,
-		"copilot",
-		"suggest",
-		"--json",
+		"--model", s.model,
+		"--output-format", "json",
 		prompt,
 	)
 
