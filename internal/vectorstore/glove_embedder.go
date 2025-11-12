@@ -1,7 +1,6 @@
 package vectorstore
 
 import (
-	"archive/zip"
 	"bufio"
 	"fmt"
 	"io"
@@ -27,10 +26,10 @@ var gloveModels = map[string]struct {
 	filename string
 	dim      int
 }{
-	"6B.50d":  {"http://nlp.stanford.edu/data/glove.6B.zip", "glove.6B.50d.txt", 50},
-	"6B.100d": {"http://nlp.stanford.edu/data/glove.6B.zip", "glove.6B.100d.txt", 100},
-	"6B.200d": {"http://nlp.stanford.edu/data/glove.6B.zip", "glove.6B.200d.txt", 200},
-	"6B.300d": {"http://nlp.stanford.edu/data/glove.6B.zip", "glove.6B.300d.txt", 300},
+	"6B.50d":  {"https://archive.org/download/glove.6B.50d-300d/glove.6B.50d.txt", "glove.6B.50d.txt", 50},
+	"6B.100d": {"https://archive.org/download/glove.6B.50d-300d/glove.6B.100d.txt", "glove.6B.100d.txt", 100},
+	"6B.200d": {"https://archive.org/download/glove.6B.50d-300d/glove.6B.200d.txt", "glove.6B.200d.txt", 200},
+	"6B.300d": {"https://archive.org/download/glove.6B.50d-300d/glove.6B.300d.txt", "glove.6B.300d.txt", 300},
 }
 
 // NewGloVeEmbedder creates a new GloVe embedder
@@ -53,8 +52,8 @@ func NewGloVeEmbedder(modelName string, cacheDir string, logger *slog.Logger) (*
 	if _, err := os.Stat(modelPath); os.IsNotExist(err) {
 		logger.Info("GloVe model not found, downloading...", "model", modelName, "path", modelPath)
 
-		// Download and extract
-		if err := downloadAndExtractGloVe(modelConfig.url, modelConfig.filename, cacheDir, logger); err != nil {
+		// Download file directly (no ZIP extraction needed)
+		if err := downloadGloVe(modelConfig.url, modelPath, logger); err != nil {
 			return nil, fmt.Errorf("failed to download GloVe model: %w", err)
 		}
 
@@ -78,11 +77,8 @@ func NewGloVeEmbedder(modelName string, cacheDir string, logger *slog.Logger) (*
 	}, nil
 }
 
-// downloadAndExtractGloVe downloads and extracts the GloVe model
-func downloadAndExtractGloVe(url, targetFile, cacheDir string, logger *slog.Logger) error {
-	// Download zip file
-	zipPath := filepath.Join(cacheDir, "glove.zip")
-
+// downloadGloVe downloads a GloVe model file directly from Internet Archive
+func downloadGloVe(url, destPath string, logger *slog.Logger) error {
 	logger.Info("Downloading GloVe model...", "url", url)
 
 	resp, err := http.Get(url)
@@ -95,14 +91,14 @@ func downloadAndExtractGloVe(url, targetFile, cacheDir string, logger *slog.Logg
 		return fmt.Errorf("download failed with status: %d", resp.StatusCode)
 	}
 
-	// Create zip file
-	out, err := os.Create(zipPath)
+	// Create destination file
+	out, err := os.Create(destPath)
 	if err != nil {
 		return fmt.Errorf("failed to create file: %w", err)
 	}
 	defer out.Close()
 
-	// Copy with progress (simple version)
+	// Copy with progress logging
 	written, err := io.Copy(out, resp.Body)
 	if err != nil {
 		return fmt.Errorf("failed to write file: %w", err)
@@ -110,53 +106,7 @@ func downloadAndExtractGloVe(url, targetFile, cacheDir string, logger *slog.Logg
 
 	logger.Info("Download complete", "size_mb", written/(1024*1024))
 
-	// Extract the specific file we need
-	logger.Info("Extracting model file...", "file", targetFile)
-
-	if err := extractFileFromZip(zipPath, targetFile, cacheDir); err != nil {
-		return fmt.Errorf("failed to extract: %w", err)
-	}
-
-	// Clean up zip file
-	os.Remove(zipPath)
-
-	logger.Info("Extraction complete")
-
 	return nil
-}
-
-// extractFileFromZip extracts a specific file from a zip archive
-func extractFileFromZip(zipPath, targetFile, destDir string) error {
-	r, err := zip.OpenReader(zipPath)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	for _, f := range r.File {
-		if f.Name == targetFile {
-			// Open file in zip
-			rc, err := f.Open()
-			if err != nil {
-				return err
-			}
-			defer rc.Close()
-
-			// Create destination file
-			destPath := filepath.Join(destDir, f.Name)
-			outFile, err := os.Create(destPath)
-			if err != nil {
-				return err
-			}
-			defer outFile.Close()
-
-			// Copy content
-			_, err = io.Copy(outFile, rc)
-			return err
-		}
-	}
-
-	return fmt.Errorf("file %s not found in zip", targetFile)
 }
 
 // loadGloVeVectors loads GloVe vectors from a text file

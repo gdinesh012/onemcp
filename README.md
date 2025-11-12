@@ -93,8 +93,8 @@ OneMCP supports two embedding strategies for tool discovery:
 - **Best for:** True semantic understanding ("screenshot" ≈ "capture")
 - **Speed:** Fast after first download (~5s to load 100d model)
 - **Quality:** State-of-the-art pre-trained embeddings
-- **Size:** ~100MB download (cached at `/tmp/onemcp-glove`)
-- **Auto-download:** Downloads model automatically on first use
+- **Size:** Individual file download (no ZIP extraction needed)
+- **Auto-download:** Downloads only the needed model file from Internet Archive
 - **Use when:** You want best semantic search quality
 
 ```json
@@ -108,10 +108,10 @@ OneMCP supports two embedding strategies for tool discovery:
 ```
 
 **Available GloVe models:**
-- `6B.50d` - 50 dimensions, 42MB download
-- `6B.100d` - 100 dimensions, 82MB download (recommended)
-- `6B.200d` - 200 dimensions, 162MB download
-- `6B.300d` - 300 dimensions, 242MB download
+- `6B.50d` - 50 dimensions, 163MB download, 192K vocab
+- `6B.100d` - 100 dimensions, 331MB download, 400K vocab (recommended)
+- `6B.200d` - 200 dimensions, 661MB download, 400K vocab
+- `6B.300d` - 300 dimensions, 990MB download, 400K vocab
 
 **Example:** Query "capture page image" finds `browser_screenshot` because GloVe learned from 6 billion words that "capture", "screenshot", and "image" are semantically related.
 
