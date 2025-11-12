@@ -136,7 +136,16 @@ func (s *IntegrationTestSuite) SetupTest() {
 	s.stdout = bufio.NewScanner(stdoutPipe)
 
 	// Capture stderr for debugging
-	s.cmd.Stderr = os.Stderr
+	stderrPipe, err := s.cmd.StderrPipe()
+	require.NoError(s.T(), err)
+
+	// Log stderr in background
+	go func() {
+		scanner := bufio.NewScanner(stderrPipe)
+		for scanner.Scan() {
+			s.T().Logf("[SERVER] %s", scanner.Text())
+		}
+	}()
 
 	// Start the process
 	err = s.cmd.Start()
@@ -573,7 +582,6 @@ func (s *IntegrationTestSuite) TestVectorStoreInitialization() {
 
 // TestToolSearchRelevance tests that tool search returns relevant results
 func (s *IntegrationTestSuite) TestToolSearchRelevance() {
-	s.T().Skip("Skipping until LLM search is fully integrated with mock binaries")
 
 	// Initialize
 	s.sendRequest("initialize", map[string]any{

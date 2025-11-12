@@ -12,11 +12,20 @@ while [[ $# -gt 0 ]]; do
       model="$2"
       shift 2
       ;;
-    --print|--output-format)
+    --print|--output-format|--tools)
       shift
       if [[ "$1" != --* ]]; then
         shift
       fi
+      ;;
+    --dangerously-skip-permissions)
+      shift
+      ;;
+    --)
+      # End of options, everything after is the prompt
+      shift
+      query="$*"
+      break
       ;;
     *)
       # Assume it's the prompt/query
@@ -46,10 +55,13 @@ else
 fi
 
 # Return mock response in Claude CLI format
+# Escape the tools JSON for embedding in the result string
+tools_escaped=$(echo "$tools" | sed 's/"/\\"/g')
+
 cat <<EOF
 {
   "type": "result",
-  "result": "$tools",
+  "result": "$tools_escaped",
   "model": "$model",
   "stop_reason": "end_turn",
   "usage": {
