@@ -27,9 +27,9 @@
     "claudeModel": "haiku",
 
     // Codex model to use when embedderType is "codex"
-    // Options: "gpt-4o" (default), "gpt-4o-mini", etc.
+    // Options: "gpt-5-codex-mini" (default), "gpt-5-codex", etc.
     // Requires Codex CLI (similar to Claude CLI)
-    "codexModel": "gpt-4o"
+    "codexModel": "gpt-5-codex-mini"
   },
 
   "mcpServers": {

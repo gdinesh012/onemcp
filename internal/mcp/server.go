@@ -29,7 +29,7 @@ type Settings struct {
 	GloVeModel        string `json:"gloveModel"`        // GloVe model: "6B.50d", "6B.100d", "6B.200d", "6B.300d" (default: "6B.100d")
 	GloveCacheDir     string `json:"gloveCacheDir"`     // Directory to cache GloVe models (default: "/tmp/onemcp-glove")
 	ClaudeModel       string `json:"claudeModel"`       // Claude model for embedder: "haiku", "sonnet", "opus" (default: "haiku")
-	CodexModel        string `json:"codexModel"`        // Codex model for embedder: "gpt-4o", "gpt-4o-mini", etc. (default: "gpt-4o")
+	CodexModel        string `json:"codexModel"`        // Codex model for embedder: "gpt-5-codex-mini", "gpt-5-codex", etc. (default: "gpt-5-codex-mini")
 }
 
 // AggregatorServer implements a generic MCP aggregator
@@ -102,7 +102,7 @@ func NewAggregatorServer(name, version string, logger *slog.Logger) (*Aggregator
 	}
 	aggregator.codexModel = config.Settings.CodexModel
 	if aggregator.codexModel == "" {
-		aggregator.codexModel = "gpt-4o" // default
+		aggregator.codexModel = "gpt-5-codex-mini" // default
 	}
 	logger.Info("Using embedder type", "type", aggregator.embedderType)
 

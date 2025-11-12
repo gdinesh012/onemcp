@@ -18,9 +18,9 @@ type CodexEmbedder struct {
 
 // NewCodexEmbedder creates a new Codex-based embedder
 func NewCodexEmbedder(model string, logger *slog.Logger) (*CodexEmbedder, error) {
-	// Default to gpt-4o if not specified
+	// Default to gpt-5-codex-mini if not specified
 	if model == "" {
-		model = "gpt-4o"
+		model = "gpt-5-codex-mini"
 	}
 
 	// Find codex binary
