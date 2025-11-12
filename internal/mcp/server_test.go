@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/radutopala/onemcp/internal/llmsearch"
 	"github.com/radutopala/onemcp/internal/tools"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -32,9 +33,11 @@ func (s *AggregatorServerTestSuite) SetupTest() {
 	// Register test tools
 	s.registerTestTools(server)
 
-	// Initialize search store after registering test tools
-	err = server.initializeSearchStore()
-	require.NoError(s.T(), err, "Failed to initialize search store")
+	// Use mock search store for tests (avoid calling real LLMs)
+	mockStore := llmsearch.NewMockSearchStore(logger)
+	err = mockStore.BuildFromTools(server.registry.ListAll())
+	require.NoError(s.T(), err, "Failed to build mock search store")
+	server.searchStore = mockStore
 
 	s.server = server
 	s.ctx = context.Background()
