@@ -72,25 +72,63 @@ OneMCP includes several optimizations for token efficiency and speed:
 
 ### Semantic Search
 
-OneMCP uses **TF-IDF embeddings** by default for fast and accurate tool discovery:
+OneMCP supports three embedding strategies for tool discovery:
 
-- **Fast and reliable**: Excellent keyword matching with term frequency analysis
-- **Works with small tool sets**: Effective with as few as 10-20 tools
-- **Pure Go**: No external dependencies, instant startup
-- **Experimental Word2Vec option**: Available for larger tool sets (50+ tools) where learning word relationships may improve results
+#### 1. **TF-IDF** (Default)
+- **Best for:** Any use case, reliable keyword matching
+- **Speed:** Instant (no model loading)
+- **Quality:** Excellent for keyword-based search
+- **Size:** 0MB overhead
 
-**Example:** Query "screenshot browser" finds all screenshot-related tools ranked by relevance.
-
-**Configuration:**
 ```json
 {
   "settings": {
-    "embedderType": "tfidf"  // or "word2vec" for experimental semantic learning
+    "embedderType": "tfidf"
   }
 }
 ```
 
-**When to use Word2Vec:** If you have 50+ tools with rich descriptions and notice that keyword matching isn't finding semantically related tools, try Word2Vec. It learns that "capture" and "screenshot" are related by observing how words appear together.
+#### 2. **GloVe** (Recommended for Best Quality)
+- **Best for:** Semantic understanding ("screenshot" ≈ "capture")
+- **Speed:** Fast after first download (~5s to load 100d model)
+- **Quality:** State-of-the-art pre-trained embeddings
+- **Size:** ~100MB download (cached at `/tmp/onemcp-glove`)
+- **Auto-download:** Downloads model automatically on first use
+
+```json
+{
+  "settings": {
+    "embedderType": "glove",
+    "gloveModel": "6B.100d",
+    "gloveCacheDir": "/tmp/onemcp-glove"
+  }
+}
+```
+
+**Available models:**
+- `6B.50d` - 50 dimensions, 42MB
+- `6B.100d` - 100 dimensions, 82MB (recommended)
+- `6B.200d` - 200 dimensions, 162MB
+- `6B.300d` - 300 dimensions, 242MB
+
+**Example:** Query "capture page image" finds `browser_screenshot` because GloVe learned from billions of words that "capture", "screenshot", and "image" are semantically related.
+
+#### 3. **Word2Vec** (Experimental)
+- **Best for:** Large tool sets (50+ tools) where you want to learn domain-specific relationships
+- **Speed:** Instant (trains on startup from your tools)
+- **Quality:** Variable - needs rich tool descriptions
+- **Size:** 0MB overhead
+- **Note:** Less effective with small tool sets (<50 tools)
+
+```json
+{
+  "settings": {
+    "embedderType": "word2vec"
+  }
+}
+```
+
+**Recommendation:** Use GloVe for best semantic search quality, or TF-IDF for zero-overhead keyword matching.
 
 ## Technology
 
@@ -298,7 +336,12 @@ Configure OneMCP behavior:
 
 **Available Settings:**
 - `searchResultLimit` (number) - Number of tools to return per search query. Default: 5. Lower values reduce token usage but require more searches for discovery.
-- `embedderType` (string) - Type of semantic search embedder. Options: `"tfidf"` (default, fast and accurate), `"word2vec"` (experimental, learns word relationships). TF-IDF provides excellent keyword matching, while Word2Vec may work better with larger tool sets (50+ tools).
+- `embedderType` (string) - Type of semantic search embedder. Options:
+  - `"tfidf"` (default) - Fast, accurate keyword matching. Works great with any tool set size.
+  - `"glove"` - Pre-trained GloVe embeddings. Best semantic understanding, auto-downloads model (~100MB).
+  - `"word2vec"` (experimental) - Learns from your tools. Needs 50+ tools to be effective.
+- `gloveModel` (string) - GloVe model to use. Options: `"6B.50d"`, `"6B.100d"` (default), `"6B.200d"`, `"6B.300d"`. Higher dimensions = better quality but larger download.
+- `gloveCacheDir` (string) - Directory to cache downloaded GloVe models. Default: `"/tmp/onemcp-glove"`.
 
 ### External Server Configuration
 

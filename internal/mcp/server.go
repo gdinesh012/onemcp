@@ -23,7 +23,9 @@ type Config struct {
 // Settings represents OneMCP settings
 type Settings struct {
 	SearchResultLimit int    `json:"searchResultLimit"` // Number of tools to return per search (default: 5)
-	EmbedderType      string `json:"embedderType"`      // Type of embedder: "word2vec" or "tfidf" (default: "word2vec")
+	EmbedderType      string `json:"embedderType"`      // Type of embedder: "tfidf", "word2vec", or "glove" (default: "tfidf")
+	GloVeModel        string `json:"gloveModel"`        // GloVe model: "6B.50d", "6B.100d", "6B.200d", "6B.300d" (default: "6B.100d")
+	GloveCacheDir     string `json:"gloveCacheDir"`     // Directory to cache GloVe models (default: "/tmp/onemcp-glove")
 }
 
 // AggregatorServer implements a generic MCP aggregator
@@ -34,7 +36,9 @@ type AggregatorServer struct {
 	vectorStore       vectorstore.VectorStore // Semantic search engine
 	externalClients   map[string]*mcpclient.MCPClient
 	searchResultLimit int    // Number of tools to return per search
-	embedderType      string // Type of embedder to use (word2vec or tfidf)
+	embedderType      string // Type of embedder to use (tfidf, word2vec, or glove)
+	gloveModel        string // GloVe model to use
+	gloveCacheDir     string // GloVe cache directory
 }
 
 // NewAggregatorServer creates a new generic aggregator server
@@ -76,8 +80,16 @@ func NewAggregatorServer(name, version string, logger *slog.Logger) (*Aggregator
 		}
 	}
 
-	// Store embedder type
+	// Store embedder configuration
 	aggregator.embedderType = config.Settings.EmbedderType
+	aggregator.gloveModel = config.Settings.GloVeModel
+	if aggregator.gloveModel == "" {
+		aggregator.gloveModel = "6B.100d" // default
+	}
+	aggregator.gloveCacheDir = config.Settings.GloveCacheDir
+	if aggregator.gloveCacheDir == "" {
+		aggregator.gloveCacheDir = "/tmp/onemcp-glove" // default
+	}
 	logger.Info("Using embedder type", "type", aggregator.embedderType)
 
 	// Create MCP server
@@ -213,6 +225,15 @@ func (s *AggregatorServer) initializeVectorStore() error {
 	var embedder vectorstore.EmbeddingGenerator
 
 	switch s.embedderType {
+	case "glove":
+		s.logger.Info("Creating GloVe embedder", "model", s.gloveModel, "cache_dir", s.gloveCacheDir)
+		gloveEmb, err := vectorstore.NewGloVeEmbedder(s.gloveModel, s.gloveCacheDir, s.logger)
+		if err != nil {
+			s.logger.Warn("Failed to create GloVe embedder, falling back to TF-IDF", "error", err)
+			embedder = vectorstore.NewTFIDFEmbedder(s.logger)
+		} else {
+			embedder = gloveEmb
+		}
 	case "word2vec":
 		s.logger.Info("Creating Word2Vec embedder", "window_size", 5, "dimension", 100)
 		embedder = vectorstore.NewWord2VecEmbedder(5, 100) // window=5, dim=100
