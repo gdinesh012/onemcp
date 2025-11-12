@@ -306,7 +306,9 @@ Execute a single tool by name.
 
 ## Configuration
 
-OneMCP uses `.onemcp.json` for configuration. See `.onemcp.json.example` for a complete example.
+OneMCP uses `.onemcp.json` for configuration. The configuration file supports **JSON with comments (JSONC)** format - add `//` for line comments or `/* */` for block comments to document your configuration.
+
+See `.onemcp.json.example` for a complete example with comments.
 
 ### Settings
 

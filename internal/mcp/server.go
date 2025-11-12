@@ -10,6 +10,7 @@ import (
 	"github.com/radutopala/onemcp/internal/mcpclient"
 	"github.com/radutopala/onemcp/internal/tools"
 	"github.com/radutopala/onemcp/internal/vectorstore"
+	"github.com/tidwall/jsonc"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -135,6 +136,9 @@ func (s *AggregatorServer) loadConfig() (*Config, error) {
 	}
 
 	s.logger.Info("Found config", "path", configPath, "size_bytes", len(data))
+
+	// Strip comments from JSON to support JSONC format
+	data = jsonc.ToJSON(data)
 
 	var config Config
 	if err := json.Unmarshal(data, &config); err != nil {

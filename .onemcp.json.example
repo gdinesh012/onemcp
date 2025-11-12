@@ -1,139 +1,190 @@
 {
+  // OneMCP Configuration
+  // This file supports JSON with comments (JSONC) format
+
   "settings": {
+    // Number of tools to return per search (default: 5)
     "searchResultLimit": 5,
+
+    // Type of embedder: "tfidf" (fast, default) or "glove" (better semantic understanding)
     "embedderType": "glove",
+
+    // GloVe model to use: "6B.50d", "6B.100d", "6B.200d", "6B.300d" (default: "6B.100d")
+    // Higher dimensions = better accuracy but more memory and slower
     "gloveModel": "6B.100d",
+
+    // Directory to cache downloaded GloVe models (default: "/tmp/onemcp-glove")
     "gloveCacheDir": "/tmp/onemcp-glove"
   },
-  "mcpServers": {
-    "_comment_transports": "OneMCP supports multiple transports: 'command' for local stdio, 'url' for remote Streamable HTTP",
 
+  "mcpServers": {
+    // OneMCP supports multiple transports:
+    // - "command" for local stdio (spawn process)
+    // - "url" for remote Streamable HTTP (MCP spec 2025-03-26+)
+
+    // Browser automation with Playwright
     "playwright": {
       "command": "npx",
       "args": ["-y", "@playwright/mcp"],
       "category": "browser",
       "enabled": true
     },
+
+    // File system operations
     "filesystem": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"],
       "category": "filesystem",
       "enabled": true
     },
+
+    // Example: Remote MCP server via Streamable HTTP
     "remote-mcp-server": {
       "url": "https://api.example.com/mcp",
       "category": "api",
-      "enabled": false,
-      "_comment": "Example Streamable HTTP transport - connect to remote MCP server (MCP spec 2025-03-26+)"
+      "enabled": false
+      // Connect to remote MCP server (MCP spec 2025-03-26+)
     },
+
+    // Knowledge graph and memory
     "memory": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-memory"],
       "category": "storage",
       "enabled": true
     },
+
+    // Web search with Brave
     "brave-search": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-brave-search"],
       "category": "search",
       "enabled": false,
       "env": {
-        "BRAVE_API_KEY": "your-api-key"
+        "BRAVE_API_KEY": "your-api-key"  // Get from https://brave.com/search/api/
       }
     },
+
+    // HTTP fetch operations
     "fetch": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-fetch"],
       "category": "web",
       "enabled": true
     },
+
+    // Date and time operations
     "time": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-time"],
       "category": "utility",
       "enabled": true
     },
+
+    // Sequential thinking and reasoning
     "sequential-thinking": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
       "category": "reasoning",
       "enabled": true
     },
+
+    // Git operations
     "git": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-git"],
       "category": "vcs",
       "enabled": true
     },
+
+    // GitHub integration
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "category": "vcs",
       "enabled": false,
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token"  // Get from https://github.com/settings/tokens
       }
     },
+
+    // GitLab integration
     "gitlab": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-gitlab"],
       "category": "vcs",
       "enabled": false,
       "env": {
-        "GITLAB_PERSONAL_ACCESS_TOKEN": "your-token"
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "your-token"  // Get from GitLab settings
       }
     },
+
+    // Google Maps integration
     "google-maps": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-google-maps"],
       "category": "maps",
       "enabled": false,
       "env": {
-        "GOOGLE_MAPS_API_KEY": "your-api-key"
+        "GOOGLE_MAPS_API_KEY": "your-api-key"  // Get from Google Cloud Console
       }
     },
+
+    // Everything search (Windows file search)
     "everything": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-everything"],
       "category": "search",
       "enabled": true
     },
+
+    // PostgreSQL database operations
     "postgres": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
       "category": "database",
       "enabled": false
     },
+
+    // Browser automation with Puppeteer
     "puppeteer": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
       "category": "browser",
       "enabled": true
     },
+
+    // SQLite database operations
     "sqlite": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sqlite", "/path/to/database.db"],
       "category": "database",
       "enabled": true
     },
+
+    // Slack integration
     "slack": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-slack"],
       "category": "communication",
       "enabled": false,
       "env": {
-        "SLACK_BOT_TOKEN": "xoxb-your-token"
+        "SLACK_BOT_TOKEN": "xoxb-your-token"  // Get from Slack app settings
       }
     },
+
+    // Sentry error tracking
     "sentry": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sentry"],
       "category": "monitoring",
       "enabled": false,
       "env": {
-        "SENTRY_AUTH_TOKEN": "your-token"
+        "SENTRY_AUTH_TOKEN": "your-token"  // Get from Sentry settings
       }
     },
+
+    // AWS Knowledge Base retrieval
     "aws-kb-retrieval": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-aws-kb-retrieval"],
