@@ -71,15 +71,13 @@ Consider:
 
 Return ONLY the JSON array, no explanation.`, query, string(toolSchemas), topK, topK)
 
-	// Call codex CLI with prompt as last argument
+	// Call codex CLI with exec subcommand
 	cmd := exec.Command(
 		e.codexBinary,
-		"--print",
-		"--output-format", "json",
+		"exec",
+		"--json",
 		"--model", e.model,
-		"--dangerously-skip-permissions",
-		"--tools", "", // Disable all tools
-		"--", // End of options
+		"--dangerously-bypass-approvals-and-sandbox",
 		prompt,
 	)
 
@@ -96,24 +94,38 @@ Return ONLY the JSON array, no explanation.`, query, string(toolSchemas), topK, 
 	// Log raw response for debugging
 	e.logger.Debug("Codex raw response", "stdout", stdout.String())
 
-	// Parse Codex's JSON response
-	// The CLI returns: {"type":"result","result":"...", ...}
-	var response struct {
-		Type   string `json:"type"`
-		Result string `json:"result"`
+	// Parse Codex's JSON Lines response
+	// The CLI returns multiple JSON objects, we need the one with type="item.completed" and item.type="agent_message"
+	var responseText string
+	lines := strings.Split(stdout.String(), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		var event struct {
+			Type string `json:"type"`
+			Item struct {
+				Type string `json:"type"`
+				Text string `json:"text"`
+			} `json:"item"`
+		}
+
+		if err := json.Unmarshal([]byte(line), &event); err != nil {
+			continue // Skip lines that don't parse
+		}
+
+		if event.Type == "item.completed" && event.Item.Type == "agent_message" {
+			responseText = event.Item.Text
+			e.logger.Debug("Parsed Codex response", "text", responseText)
+			break
+		}
 	}
 
-	if err := json.Unmarshal(stdout.Bytes(), &response); err != nil {
-		return nil, fmt.Errorf("failed to parse codex response: %w, output: %s", err, stdout.String())
+	if responseText == "" {
+		return nil, fmt.Errorf("no agent_message in codex response: %s", stdout.String())
 	}
-
-	e.logger.Debug("Parsed Codex response", "type", response.Type, "result", response.Result)
-
-	if response.Result == "" {
-		return nil, fmt.Errorf("no result in codex response")
-	}
-
-	responseText := response.Result
 
 	// Parse the JSON array of tool names from Codex's response
 	// Codex might wrap it in markdown code blocks, so clean that up
