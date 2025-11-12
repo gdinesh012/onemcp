@@ -25,19 +25,28 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Extract tool names from query if present
+# Extract the actual user query from the prompt
+# The prompt format is: Given this query: "USER_QUERY"
+user_query=$(echo "$query" | sed -n 's/.*Given this query: "\([^"]*\)".*/\1/p')
+
+# If we couldn't extract the user query, use the full query
+if [ -z "$user_query" ]; then
+  user_query="$query"
+fi
+
+# Extract tool names based on user query
 # Mock response with tools that match the integration test mock servers
-if [[ "$query" == *"screenshot"* ]] || [[ "$query" == *"image"* ]] || [[ "$query" == *"capture"* ]]; then
+if [[ "$user_query" == *"screenshot"* ]] || [[ "$user_query" == *"image"* ]] || [[ "$user_query" == *"capture"* ]]; then
   tools='["browser_screenshot"]'
-elif [[ "$query" == *"navigate"* ]] || [[ "$query" == *"page"* ]] || [[ "$query" == *"browser"* ]]; then
+elif [[ "$user_query" == *"navigate"* ]] || [[ "$user_query" == *"webpage"* ]]; then
   tools='["browser_navigate"]'
-elif [[ "$query" == *"click"* ]]; then
+elif [[ "$user_query" == *"click"* ]] || [[ "$user_query" == *"element"* ]]; then
   tools='["browser_click"]'
-elif [[ "$query" == *"file"* ]] || [[ "$query" == *"read"* ]]; then
+elif [[ "$user_query" == *"read"* ]] && [[ "$user_query" == *"file"* ]]; then
   tools='["filesystem_read_file"]'
-elif [[ "$query" == *"write"* ]]; then
+elif [[ "$user_query" == *"write"* ]] && [[ "$user_query" == *"file"* ]]; then
   tools='["filesystem_write_file"]'
-elif [[ "$query" == *"directory"* ]] || [[ "$query" == *"list"* ]]; then
+elif [[ "$user_query" == *"directory"* ]] || [[ "$user_query" == *"list"* ]]; then
   tools='["filesystem_list_directory"]'
 else
   # Default: return tools from mock servers

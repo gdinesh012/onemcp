@@ -636,6 +636,249 @@ func (s *IntegrationTestSuite) TestToolSearchRelevance() {
 	require.True(s.T(), foundScreenshot, "Tool search should find 'screenshot' tool for query 'capture page image'")
 }
 
+// TestToolSearchWithClaudeProvider tests tool search specifically with Claude provider
+func (s *IntegrationTestSuite) TestToolSearchWithClaudeProvider() {
+	// Initialize
+	s.sendRequest("initialize", map[string]any{
+		"protocolVersion": "2024-11-05",
+		"capabilities":    map[string]any{},
+		"clientInfo": map[string]any{
+			"name":    "integration-test",
+			"version": "1.0.0",
+		},
+	})
+	s.readResponse()
+
+	// Test search with Claude (default provider in config)
+	s.sendRequest("tools/call", map[string]any{
+		"name": "tool_search",
+		"arguments": map[string]any{
+			"query":        "navigate to webpage",
+			"detail_level": "summary",
+		},
+	})
+	resp := s.readResponse()
+
+	require.Nil(s.T(), resp.Error)
+	require.NotNil(s.T(), resp.Result)
+
+	content, ok := resp.Result["content"].([]any)
+	require.True(s.T(), ok)
+	require.Greater(s.T(), len(content), 0)
+
+	firstContent, ok := content[0].(map[string]any)
+	require.True(s.T(), ok)
+
+	var result map[string]any
+	err := json.Unmarshal([]byte(firstContent["text"].(string)), &result)
+	require.NoError(s.T(), err)
+
+	// Verify we got tools
+	tools, ok := result["tools"].([]any)
+	require.True(s.T(), ok)
+	require.Greater(s.T(), len(tools), 0, "Claude provider should return tools")
+
+	// Verify navigate tool is in results
+	foundNavigate := false
+	for _, tool := range tools {
+		toolMap, ok := tool.(map[string]any)
+		require.True(s.T(), ok)
+		if toolMap["name"] == "browser_navigate" {
+			foundNavigate = true
+			require.Equal(s.T(), "browser", toolMap["category"])
+			require.Contains(s.T(), toolMap["description"], "Navigate")
+			break
+		}
+	}
+	require.True(s.T(), foundNavigate, "Claude provider should find 'navigate' tool for query 'navigate to webpage'")
+}
+
+// TestToolSearchWithCodexProvider tests tool search specifically with Codex provider
+func (s *IntegrationTestSuite) TestToolSearchWithCodexProvider() {
+	// Stop current server
+	if s.cmd != nil && s.cmd.Process != nil {
+		s.cmd.Process.Kill()
+		s.cmd.Wait()
+	}
+	if s.cancel != nil {
+		s.cancel()
+	}
+
+	// Update config to use Codex
+	config := map[string]any{
+		"settings": map[string]any{
+			"searchResultLimit": 5,
+			"searchProvider":    "codex",
+			"codexModel":        "gpt-5-codex-mini",
+		},
+		"mcpServers": map[string]any{
+			"browser": map[string]any{
+				"url":      s.browserServer.URL,
+				"category": "browser",
+				"enabled":  true,
+			},
+			"filesystem": map[string]any{
+				"url":      s.filesystemServer.URL,
+				"category": "filesystem",
+				"enabled":  true,
+			},
+		},
+	}
+	data, err := json.MarshalIndent(config, "", "  ")
+	require.NoError(s.T(), err)
+	err = os.WriteFile(s.configPath, data, 0644)
+	require.NoError(s.T(), err)
+
+	// Restart server with new config
+	s.SetupTest()
+
+	// Initialize
+	s.sendRequest("initialize", map[string]any{
+		"protocolVersion": "2024-11-05",
+		"capabilities":    map[string]any{},
+		"clientInfo": map[string]any{
+			"name":    "integration-test",
+			"version": "1.0.0",
+		},
+	})
+	s.readResponse()
+
+	// Test search with Codex
+	s.sendRequest("tools/call", map[string]any{
+		"name": "tool_search",
+		"arguments": map[string]any{
+			"query":        "read file contents",
+			"detail_level": "summary",
+		},
+	})
+	resp := s.readResponse()
+
+	require.Nil(s.T(), resp.Error)
+	require.NotNil(s.T(), resp.Result)
+
+	content, ok := resp.Result["content"].([]any)
+	require.True(s.T(), ok)
+	require.Greater(s.T(), len(content), 0)
+
+	firstContent, ok := content[0].(map[string]any)
+	require.True(s.T(), ok)
+
+	var result map[string]any
+	err = json.Unmarshal([]byte(firstContent["text"].(string)), &result)
+	require.NoError(s.T(), err)
+
+	// Verify we got tools
+	tools, ok := result["tools"].([]any)
+	require.True(s.T(), ok)
+	require.Greater(s.T(), len(tools), 0, "Codex provider should return tools")
+
+	// Verify read_file tool is in results
+	foundReadFile := false
+	for _, tool := range tools {
+		toolMap, ok := tool.(map[string]any)
+		require.True(s.T(), ok)
+		if toolMap["name"] == "filesystem_read_file" {
+			foundReadFile = true
+			require.Equal(s.T(), "filesystem", toolMap["category"])
+			break
+		}
+	}
+	require.True(s.T(), foundReadFile, "Codex provider should find 'read_file' tool for query 'read file contents'")
+}
+
+// TestToolSearchWithCopilotProvider tests tool search specifically with Copilot provider
+func (s *IntegrationTestSuite) TestToolSearchWithCopilotProvider() {
+	// Stop current server
+	if s.cmd != nil && s.cmd.Process != nil {
+		s.cmd.Process.Kill()
+		s.cmd.Wait()
+	}
+	if s.cancel != nil {
+		s.cancel()
+	}
+
+	// Update config to use Copilot
+	config := map[string]any{
+		"settings": map[string]any{
+			"searchResultLimit": 5,
+			"searchProvider":    "copilot",
+			"copilotModel":      "claude-haiku-4.5",
+		},
+		"mcpServers": map[string]any{
+			"browser": map[string]any{
+				"url":      s.browserServer.URL,
+				"category": "browser",
+				"enabled":  true,
+			},
+			"filesystem": map[string]any{
+				"url":      s.filesystemServer.URL,
+				"category": "filesystem",
+				"enabled":  true,
+			},
+		},
+	}
+	data, err := json.MarshalIndent(config, "", "  ")
+	require.NoError(s.T(), err)
+	err = os.WriteFile(s.configPath, data, 0644)
+	require.NoError(s.T(), err)
+
+	// Restart server with new config
+	s.SetupTest()
+
+	// Initialize
+	s.sendRequest("initialize", map[string]any{
+		"protocolVersion": "2024-11-05",
+		"capabilities":    map[string]any{},
+		"clientInfo": map[string]any{
+			"name":    "integration-test",
+			"version": "1.0.0",
+		},
+	})
+	s.readResponse()
+
+	// Test search with Copilot
+	s.sendRequest("tools/call", map[string]any{
+		"name": "tool_search",
+		"arguments": map[string]any{
+			"query":        "click element",
+			"detail_level": "summary",
+		},
+	})
+	resp := s.readResponse()
+
+	require.Nil(s.T(), resp.Error)
+	require.NotNil(s.T(), resp.Result)
+
+	content, ok := resp.Result["content"].([]any)
+	require.True(s.T(), ok)
+	require.Greater(s.T(), len(content), 0)
+
+	firstContent, ok := content[0].(map[string]any)
+	require.True(s.T(), ok)
+
+	var result map[string]any
+	err = json.Unmarshal([]byte(firstContent["text"].(string)), &result)
+	require.NoError(s.T(), err)
+
+	// Verify we got tools
+	tools, ok := result["tools"].([]any)
+	require.True(s.T(), ok)
+	require.Greater(s.T(), len(tools), 0, "Copilot provider should return tools")
+
+	// Verify click tool is in results
+	foundClick := false
+	for _, tool := range tools {
+		toolMap, ok := tool.(map[string]any)
+		require.True(s.T(), ok)
+		if toolMap["name"] == "browser_click" {
+			foundClick = true
+			require.Equal(s.T(), "browser", toolMap["category"])
+			break
+		}
+	}
+	require.True(s.T(), foundClick, "Copilot provider should find 'click' tool for query 'click element'")
+}
+
 // createMockBrowserServer creates a mock MCP server with browser tools
 func (s *IntegrationTestSuite) createMockBrowserServer() *httptest.Server {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
