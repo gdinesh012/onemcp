@@ -1,7 +1,7 @@
-//go:build integration
-// +build integration
+//go:build component
+// +build component
 
-package integration
+package component
 
 import (
 	"context"
@@ -18,8 +18,8 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-// HTTPIntegrationTestSuite tests Streamable HTTP transport
-type HTTPIntegrationTestSuite struct {
+// HTTPComponentTestSuite tests Streamable HTTP transport
+type HTTPComponentTestSuite struct {
 	suite.Suite
 	server    *httptest.Server
 	mcpServer *mcp.Server
@@ -28,7 +28,7 @@ type HTTPIntegrationTestSuite struct {
 }
 
 // SetupSuite starts the HTTP test server
-func (s *HTTPIntegrationTestSuite) SetupSuite() {
+func (s *HTTPComponentTestSuite) SetupSuite() {
 	s.ctx, s.cancel = context.WithTimeout(context.Background(), 30*time.Second)
 
 	// Create a test MCP server with some tools
@@ -73,7 +73,7 @@ func (s *HTTPIntegrationTestSuite) SetupSuite() {
 }
 
 // TearDownSuite stops the HTTP test server
-func (s *HTTPIntegrationTestSuite) TearDownSuite() {
+func (s *HTTPComponentTestSuite) TearDownSuite() {
 	if s.server != nil {
 		s.server.Close()
 	}
@@ -83,7 +83,7 @@ func (s *HTTPIntegrationTestSuite) TearDownSuite() {
 }
 
 // TestStreamableHTTPConnection tests basic connection to HTTP server
-func (s *HTTPIntegrationTestSuite) TestStreamableHTTPConnection() {
+func (s *HTTPComponentTestSuite) TestStreamableHTTPConnection() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelError,
 	}))
@@ -105,7 +105,7 @@ func (s *HTTPIntegrationTestSuite) TestStreamableHTTPConnection() {
 }
 
 // TestStreamableHTTPListTools tests listing tools via HTTP
-func (s *HTTPIntegrationTestSuite) TestStreamableHTTPListTools() {
+func (s *HTTPComponentTestSuite) TestStreamableHTTPListTools() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelError,
 	}))
@@ -141,7 +141,7 @@ func (s *HTTPIntegrationTestSuite) TestStreamableHTTPListTools() {
 }
 
 // TestStreamableHTTPCallTool tests calling a tool via HTTP
-func (s *HTTPIntegrationTestSuite) TestStreamableHTTPCallTool() {
+func (s *HTTPComponentTestSuite) TestStreamableHTTPCallTool() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelError,
 	}))
@@ -174,7 +174,7 @@ func (s *HTTPIntegrationTestSuite) TestStreamableHTTPCallTool() {
 }
 
 // TestStreamableHTTPSchemaCache tests that schemas are cached
-func (s *HTTPIntegrationTestSuite) TestStreamableHTTPSchemaCache() {
+func (s *HTTPComponentTestSuite) TestStreamableHTTPSchemaCache() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelError,
 	}))
@@ -205,7 +205,7 @@ func (s *HTTPIntegrationTestSuite) TestStreamableHTTPSchemaCache() {
 }
 
 // TestStreamableHTTPInvalidEndpoint tests error handling for invalid endpoint
-func (s *HTTPIntegrationTestSuite) TestStreamableHTTPInvalidEndpoint() {
+func (s *HTTPComponentTestSuite) TestStreamableHTTPInvalidEndpoint() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelError,
 	}))
@@ -229,6 +229,6 @@ func (s *HTTPIntegrationTestSuite) TestStreamableHTTPInvalidEndpoint() {
 }
 
 // TestHTTPIntegrationSuite runs the test suite
-func TestHTTPIntegrationSuite(t *testing.T) {
-	suite.Run(t, new(HTTPIntegrationTestSuite))
+func TestHTTPComponentSuite(t *testing.T) {
+	suite.Run(t, new(HTTPComponentTestSuite))
 }

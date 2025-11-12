@@ -1,4 +1,4 @@
-.PHONY: help all build build-darwin build-linux build-all clean test test-coverage test-integration
+.PHONY: help all build build-darwin build-linux build-all clean test test-coverage test-component
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -41,8 +41,8 @@ test-coverage: ## Run tests with coverage report
 	go tool cover -func=coverage.out
 	@echo "Coverage report generated: coverage.out"
 
-test-integration: ## Run integration tests (builds binary first)
-	@echo "Running integration tests..."
+test-component: ## Run component tests (builds binary first)
+	@echo "Running component tests..."
 	@echo "Note: Binary will be built automatically by the test suite"
-	go test -v -tags=integration ./integration/...
-	@echo "Integration tests completed"
+	go test -v -tags=component ./component/...
+	@echo "Component tests completed"

@@ -1,7 +1,7 @@
-//go:build integration
-// +build integration
+//go:build component
+// +build component
 
-package integration
+package component
 
 import (
 	"bufio"
@@ -44,7 +44,7 @@ type JSONRPCError struct {
 	Data    any    `json:"data,omitempty"`
 }
 
-type IntegrationTestSuite struct {
+type ComponentTestSuite struct {
 	suite.Suite
 	binaryPath       string
 	cmd              *exec.Cmd
@@ -58,8 +58,8 @@ type IntegrationTestSuite struct {
 }
 
 // SetupSuite builds the binary and starts mock MCP servers
-func (s *IntegrationTestSuite) SetupSuite() {
-	// Get project root (integration tests are in integration/)
+func (s *ComponentTestSuite) SetupSuite() {
+	// Get project root (component tests are in component/)
 	projectRoot, err := filepath.Abs(filepath.Join(".."))
 	require.NoError(s.T(), err)
 
@@ -90,7 +90,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 }
 
 // TearDownSuite cleans up the binary and mock servers after all tests
-func (s *IntegrationTestSuite) TearDownSuite() {
+func (s *ComponentTestSuite) TearDownSuite() {
 	if s.binaryPath != "" {
 		s.T().Log("Cleaning up test binary...")
 		os.Remove(s.binaryPath)
@@ -107,7 +107,7 @@ func (s *IntegrationTestSuite) TearDownSuite() {
 }
 
 // SetupTest starts the binary for each test
-func (s *IntegrationTestSuite) SetupTest() {
+func (s *ComponentTestSuite) SetupTest() {
 	s.ctx, s.cancel = context.WithTimeout(context.Background(), 30*time.Second)
 
 	// Start the binary with config file
@@ -153,7 +153,7 @@ func (s *IntegrationTestSuite) SetupTest() {
 }
 
 // TearDownTest stops the binary after each test
-func (s *IntegrationTestSuite) TearDownTest() {
+func (s *ComponentTestSuite) TearDownTest() {
 	if s.cancel != nil {
 		s.cancel()
 	}
@@ -164,12 +164,12 @@ func (s *IntegrationTestSuite) TearDownTest() {
 }
 
 // sendRequest sends a JSON-RPC request to the binary
-func (s *IntegrationTestSuite) sendRequest(method string, params any) {
+func (s *ComponentTestSuite) sendRequest(method string, params any) {
 	s.sendRequestWithID(method, params, 1)
 }
 
 // sendRequestWithID sends a JSON-RPC request with a specific ID (or nil for notifications)
-func (s *IntegrationTestSuite) sendRequestWithID(method string, params any, id any) {
+func (s *ComponentTestSuite) sendRequestWithID(method string, params any, id any) {
 	req := JSONRPCRequest{
 		JSONRPC: "2.0",
 		ID:      id,
@@ -191,7 +191,7 @@ func (s *IntegrationTestSuite) sendRequestWithID(method string, params any, id a
 }
 
 // readResponse reads a JSON-RPC response from the binary
-func (s *IntegrationTestSuite) readResponse() *JSONRPCResponse {
+func (s *ComponentTestSuite) readResponse() *JSONRPCResponse {
 	require.True(s.T(), s.stdout.Scan(), "Failed to read response")
 
 	line := s.stdout.Bytes()
@@ -205,7 +205,7 @@ func (s *IntegrationTestSuite) readResponse() *JSONRPCResponse {
 }
 
 // TestInitialize tests the MCP initialize handshake
-func (s *IntegrationTestSuite) TestInitialize() {
+func (s *ComponentTestSuite) TestInitialize() {
 	params := map[string]any{
 		"protocolVersion": "2024-11-05",
 		"capabilities":    map[string]any{},
@@ -230,7 +230,7 @@ func (s *IntegrationTestSuite) TestInitialize() {
 }
 
 // TestToolsList tests the tools/list endpoint
-func (s *IntegrationTestSuite) TestToolsList() {
+func (s *ComponentTestSuite) TestToolsList() {
 	// Initialize first
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -270,7 +270,7 @@ func (s *IntegrationTestSuite) TestToolsList() {
 }
 
 // TestToolSearch tests the tool_search functionality
-func (s *IntegrationTestSuite) TestToolSearch() {
+func (s *ComponentTestSuite) TestToolSearch() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -313,7 +313,7 @@ func (s *IntegrationTestSuite) TestToolSearch() {
 }
 
 // TestToolExecute tests the tool_execute functionality
-func (s *IntegrationTestSuite) TestToolExecute() {
+func (s *ComponentTestSuite) TestToolExecute() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -350,7 +350,7 @@ func (s *IntegrationTestSuite) TestToolExecute() {
 }
 
 // TestSchemaFileFixedLimit tests that tool_search returns exactly 5 tools
-func (s *IntegrationTestSuite) TestSchemaFileFixedLimit() {
+func (s *ComponentTestSuite) TestSchemaFileFixedLimit() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -399,7 +399,7 @@ func (s *IntegrationTestSuite) TestSchemaFileFixedLimit() {
 }
 
 // TestToolSearchWithCategory tests tool search with category filter
-func (s *IntegrationTestSuite) TestToolSearchWithCategory() {
+func (s *ComponentTestSuite) TestToolSearchWithCategory() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -451,7 +451,7 @@ func (s *IntegrationTestSuite) TestToolSearchWithCategory() {
 }
 
 // TestToolSearchDetailLevels tests different detail levels in tool search
-func (s *IntegrationTestSuite) TestToolSearchDetailLevels() {
+func (s *ComponentTestSuite) TestToolSearchDetailLevels() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -531,7 +531,7 @@ func (s *IntegrationTestSuite) TestToolSearchDetailLevels() {
 }
 
 // TestVectorStoreInitialization tests that vector store is properly initialized
-func (s *IntegrationTestSuite) TestVectorStoreInitialization() {
+func (s *ComponentTestSuite) TestVectorStoreInitialization() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -581,7 +581,7 @@ func (s *IntegrationTestSuite) TestVectorStoreInitialization() {
 }
 
 // TestToolSearchRelevance tests that tool search returns relevant results
-func (s *IntegrationTestSuite) TestToolSearchRelevance() {
+func (s *ComponentTestSuite) TestToolSearchRelevance() {
 
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
@@ -637,7 +637,7 @@ func (s *IntegrationTestSuite) TestToolSearchRelevance() {
 }
 
 // TestToolSearchWithClaudeProvider tests tool search specifically with Claude provider
-func (s *IntegrationTestSuite) TestToolSearchWithClaudeProvider() {
+func (s *ComponentTestSuite) TestToolSearchWithClaudeProvider() {
 	// Initialize
 	s.sendRequest("initialize", map[string]any{
 		"protocolVersion": "2024-11-05",
@@ -694,7 +694,7 @@ func (s *IntegrationTestSuite) TestToolSearchWithClaudeProvider() {
 }
 
 // TestToolSearchWithCodexProvider tests tool search specifically with Codex provider
-func (s *IntegrationTestSuite) TestToolSearchWithCodexProvider() {
+func (s *ComponentTestSuite) TestToolSearchWithCodexProvider() {
 	// Stop current server
 	if s.cmd != nil && s.cmd.Process != nil {
 		s.cmd.Process.Kill()
@@ -787,7 +787,7 @@ func (s *IntegrationTestSuite) TestToolSearchWithCodexProvider() {
 }
 
 // TestToolSearchWithCopilotProvider tests tool search specifically with Copilot provider
-func (s *IntegrationTestSuite) TestToolSearchWithCopilotProvider() {
+func (s *ComponentTestSuite) TestToolSearchWithCopilotProvider() {
 	// Stop current server
 	if s.cmd != nil && s.cmd.Process != nil {
 		s.cmd.Process.Kill()
@@ -880,7 +880,7 @@ func (s *IntegrationTestSuite) TestToolSearchWithCopilotProvider() {
 }
 
 // createMockBrowserServer creates a mock MCP server with browser tools
-func (s *IntegrationTestSuite) createMockBrowserServer() *httptest.Server {
+func (s *ComponentTestSuite) createMockBrowserServer() *httptest.Server {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
 
 	mcpServer := mcp.NewServer(
@@ -933,7 +933,7 @@ func (s *IntegrationTestSuite) createMockBrowserServer() *httptest.Server {
 }
 
 // createMockFilesystemServer creates a mock MCP server with filesystem tools
-func (s *IntegrationTestSuite) createMockFilesystemServer() *httptest.Server {
+func (s *ComponentTestSuite) createMockFilesystemServer() *httptest.Server {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
 
 	mcpServer := mcp.NewServer(
@@ -987,7 +987,7 @@ func (s *IntegrationTestSuite) createMockFilesystemServer() *httptest.Server {
 }
 
 // createConfigFile creates a .onemcp-test.json config pointing to mock servers
-func (s *IntegrationTestSuite) createConfigFile() {
+func (s *ComponentTestSuite) createConfigFile() {
 	config := map[string]any{
 		"settings": map[string]any{
 			"searchResultLimit": 5,
@@ -1015,10 +1015,10 @@ func (s *IntegrationTestSuite) createConfigFile() {
 	require.NoError(s.T(), err)
 }
 
-func TestIntegrationSuite(t *testing.T) {
+func TestComponentSuite(t *testing.T) {
 	if testing.Short() {
-		t.Skip("Skipping integration tests in short mode")
+		t.Skip("Skipping component tests in short mode")
 	}
 
-	suite.Run(t, new(IntegrationTestSuite))
+	suite.Run(t, new(ComponentTestSuite))
 }
